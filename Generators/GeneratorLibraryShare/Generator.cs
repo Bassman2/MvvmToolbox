@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -19,6 +20,7 @@ public class Generator : BaseAttributes, IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        context.RegisterPostInitializationOutput(postInitializationContext => CreateAttributes(postInitializationContext));
 
         var provider = context.SyntaxProvider.CreateSyntaxProvider(
                 predicate: static (node, _) => IsSyntaxTargetForGeneration(node),           //node is ClassDeclarationSyntax || node is EnumDeclarationSyntax,
@@ -27,16 +29,18 @@ public class Generator : BaseAttributes, IIncrementalGenerator
 
         var compilation = context.CompilationProvider.Combine(provider);
 
-        context.RegisterSourceOutput(compilation, Excecute);
+        context.RegisterSourceOutput(compilation, Execute);
     }
+
+    protected virtual void CreateAttributes(IncrementalGeneratorPostInitializationContext context)
+    { }
 
     private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
      => (node is ClassDeclarationSyntax c && c.AttributeLists.Count > 0) ||
         (node is EnumDeclarationSyntax e && e.AttributeLists.Count > 0);
 
 
-    //private void Excecute(SourceProductionContext context, (Compilation Left, ImmutableArray<ClassDeclarationSyntax> Right) tuple)
-    private void Excecute(SourceProductionContext context, (Compilation Left, ImmutableArray<BaseTypeDeclarationSyntax> Right) tuple)
+    private void Execute(SourceProductionContext context, (Compilation Left, ImmutableArray<BaseTypeDeclarationSyntax> Right) tuple)
     {
         Context = context;
         Compilation = tuple.Left;
@@ -44,7 +48,7 @@ public class Generator : BaseAttributes, IIncrementalGenerator
         Enums = [.. tuple.Right.Where(i => i is EnumDeclarationSyntax).Cast<EnumDeclarationSyntax>()];
         try
         {
-            Excecute();
+            Execute();
         }
         catch (Exception ex)
         {
@@ -62,7 +66,7 @@ public class Generator : BaseAttributes, IIncrementalGenerator
 
     protected EnumDeclarationSyntax[] Enums { get; private set; } = [];
 
-    public virtual void Excecute()
+    public virtual void Execute()
     { }
 
     public IEnumerable<Class> GetAllClasses()
