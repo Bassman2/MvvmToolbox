@@ -1,7 +1,7 @@
 ﻿using GeneratorLibrary;
 using System.Text;
 
-namespace ObservableModelsGenerator;
+namespace MvvmToolbox.SourceGenerators;
 
 partial class ObservableModelGenerator
 {

@@ -1,9 +1,9 @@
 ﻿using GeneratorLibrary;
 using Microsoft.CodeAnalysis;
 
-namespace ObservableModelsGenerator;
+namespace MvvmToolbox.SourceGenerators;
 
-[Generator]
+[Generator(LanguageNames.CSharp)]
 public partial class ObservableModelGenerator : Generator
 {
     private const string FindFieldsGeneratorAttribute = "MediaDevices.FindFieldsGeneratorAttribute";
@@ -15,7 +15,7 @@ public partial class ObservableModelGenerator : Generator
         //Debugger.Launch();
 
         // for debug only
-        //CreateDebug();
+        CreateAttributes();
 
         // get all enums with [FindFieldsGeneratorAttribute] 
         foreach (var en in GetAllEnumsWithAttribute(FindFieldsGeneratorAttribute))
