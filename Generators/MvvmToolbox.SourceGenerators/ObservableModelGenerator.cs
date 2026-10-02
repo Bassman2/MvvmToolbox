@@ -246,7 +246,7 @@ public partial class ObservableModelGenerator : Generator
                     
                     sb.AppendLine(
                         $$"""
-                            partial void On{{prop.Name}}Changed(string value)
+                            partial void On{{prop.Name}}Changed({{prop.Type.FullName}} value)
                             {
                                 Model.{{modelPropName}} = value;
                             }
