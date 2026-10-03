@@ -3,4 +3,8 @@
     <Project Path="Generators/GeneratorLibraryShare/GeneratorLibraryShare.shproj" Id="dca7dd44-310c-48bd-bc75-c4203d5c3200" />
     <Project Path="Generators/MvvmToolbox.SourceGenerators/MvvmToolbox.SourceGenerators.csproj" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/NugetTest/NugetTest.csproj" Id="eadb532d-97fc-48a7-87e9-ec068d76cfd1" />
+    <Project Path="Tests/ObservableModelGeneratorUnitTests/ObservableModelGeneratorUnitTests.csproj" Id="34ca77eb-6e3b-45a2-a72a-238fd6537f98" />
+  </Folder>
 </Solution>

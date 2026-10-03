@@ -1,0 +1,1 @@
+nuget pack MvvmToolbox.nuspec -properties Configuration=Release
