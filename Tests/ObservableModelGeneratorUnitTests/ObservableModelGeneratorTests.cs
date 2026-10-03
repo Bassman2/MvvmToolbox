@@ -54,9 +54,33 @@ public sealed class ObservableModelGeneratorTests
     //}
 
     [TestMethod]
-    public void TestRootListProperty()
+    public void TestRootStringListProperty()
     {
-        var model = new RootModel { NumberA = 10, NumberB = null };
+        var model = new RootModel { StringListA = [ "TestA", "TestB" ], StringListB = null };
+        var viewModel = new RootViewModel(model);
+        viewModel.NumberA = 20;
+        viewModel.NumberB = 30;
+
+        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
+        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
+    }
+
+    [TestMethod]
+    public void TestRootIntListProperty()
+    {
+        var model = new RootModel { IntListA = [10, 20], IntListB = null };
+        var viewModel = new RootViewModel(model);
+        viewModel.NumberA = 20;
+        viewModel.NumberB = 30;
+
+        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
+        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
+    }
+
+    [TestMethod]
+    public void TestRootModelListProperty()
+    {
+        var model = new RootModel { ModelListA = [ new LeafModel(), new LeafModel()], ModelListB = null };
         var viewModel = new RootViewModel(model);
         viewModel.NumberA = 20;
         viewModel.NumberB = 30;

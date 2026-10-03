@@ -1,6 +1,8 @@
 ﻿using GeneratorLibrary;
 using Microsoft.CodeAnalysis;
+using System;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace MvvmToolbox.SourceGenerators;
@@ -17,6 +19,14 @@ public partial class ObservableModelGenerator : Generator
 
     public override void Execute()
     {
+        //Location errorLocation = propertySyntax.GetLocation();
+        //string propertyName = propertySyntax.Identifier.Text;
+
+        //Diagnostic diagnostic = Diagnostic.Create(GeneratorDiagnostics.InvalidPropertyError, errorLocation, propertyName);  // Befüllt das '{0}' im messageFormat
+        //Context.ReportDiagnostic(diagnostic);
+
+        //ReportError("Test");
+
         //Debugger.Launch();
         CreateDebug();
 
@@ -263,4 +273,111 @@ public partial class ObservableModelGenerator : Generator
         AddSource($"{cl.Name}.g.cs", sb.ToString());
     }
 
+    public enum DataType
+    {
+        Error,
+        Simple,
+        Model,
+        List,
+        ModelList,
+        Lambda,
+    }
+
+    public string CreateConstructorLine(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName )
+    {
+        return dataType switch
+        {
+            DataType.Error => string.Empty,
+            DataType.Simple =>      
+                $"    {viewModelPropertyName} = model.{modelPropertyName};",
+            DataType.Model =>       
+                $"    {viewModelPropertyName} = new {viewModelPropertyType}(model.{modelPropertyName});",
+            DataType.List =>        
+                $$"""
+                    {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}];
+                    {{viewModelPropertyName}}.CollectionChanged += On{{modelPropertyName}}
+                """,
+            DataType.ModelList =>   
+                $$"""
+                    {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {viewModelPropertyType}(m))];
+                    {{viewModelPropertyName}}.CollectionChanged += On{{modelPropertyName}}
+                """,
+            //DataType.Lambda => "Lambda",
+            //    $"    {viewModelPropertyName} = get(model.{modelPropertyName});",
+            _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
+        };
+    }
+
+    public string CreateSetterMethods(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName)
+    {
+        return dataType switch
+        {
+            DataType.Error => string.Empty,
+            DataType.Simple =>
+                $$"""
+                    partial void On{{viewModelPropertyName}}Changed({{viewModelPropertyType}} value)
+                    {
+                        Model.{{modelPropertyName}} = value;
+                    }
+
+                """,
+        DataType.Model =>
+                $$"""
+                    partial void On{{viewModelPropertyName}}Changed({{viewModelPropertyType}} value)
+                    {
+                        Model.{{modelPropertyName}} = value.Model;
+                    }
+
+                """,
+            DataType.List =>
+                $$"""
+                    private void On{{prop.Name}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+                    {
+                        switch (e.Action)
+                        {
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
+                            int index = e.NewStartingIndex;
+                            foreach ({{viewModelTypeName}} item in e.NewItems)
+                            {
+                                Model.{{modelPropName}}.Insert(index++, item);
+                            }
+                            break;
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Remove when e.OldItems != null:
+                            foreach ({{viewModelTypeName}} item in e.OldItems)
+                            {
+                                 Model.{{modelPropName}}.Remove(item);
+                            }
+                            break;
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                            var modelToMove =  Model.{{modelPropName}}[e.OldStartingIndex];
+                            Model.{{modelPropName}}.RemoveAt(e.OldStartingIndex);
+                            Model.{{modelPropName}}.Insert(e.NewStartingIndex, modelToMove);
+                            break;
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Replace when e.NewItems != null:
+                            int replaceIndex = e.NewStartingIndex;
+                            foreach ({{viewModelTypeName}} item in e.NewItems)
+                            {
+                                Model.{{modelPropName}}[replaceIndex++] = item;
+                            }
+                            break;
+                        case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                            Model.{{modelPropName}}.Clear();
+                            foreach ({{viewModelTypeName}} item in {{prop.Name}})
+                            {
+                                Model.{{modelPropName}}.Add(item);
+                            }
+                            break;
+                        }   
+                    }
+                """);
+        DataType.ModelList =>
+                $$"""
+                    {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {viewModelPropertyType}(m))];
+                    {{viewModelPropertyName}}.CollectionChanged += On{{modelPropertyName}}
+                """,
+            //DataType.Lambda => "Lambda",
+            //    $"    {viewModelPropertyName} = get(model.{modelPropertyName});",
+            _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
+        };
+    }
 }
