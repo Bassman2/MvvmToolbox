@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace GeneratorLibrary
