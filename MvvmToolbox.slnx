@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="Generator/GeneratorLibraryShare/GeneratorLibraryShare.shproj" Id="dca7dd44-310c-48bd-bc75-c4203d5c3200" />
-  <Project Path="Generator/ObservableModelsGenerator/ObservableModelsGenerator.csproj" />
+  <Folder Name="/Generators/">
+    <Project Path="Generators/GeneratorLibraryShare/GeneratorLibraryShare.shproj" Id="dca7dd44-310c-48bd-bc75-c4203d5c3200" />
+    <Project Path="Generators/MvvmToolbox.SourceGenerators/MvvmToolbox.SourceGenerators.csproj" />
+  </Folder>
 </Solution>
