@@ -25,4 +25,8 @@
     <PackageReference Update="MSTest.TestFramework" Version="4.4.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Generators\MvvmToolbox.SourceGenerators\MvvmToolbox.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>

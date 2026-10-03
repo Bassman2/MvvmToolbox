@@ -1,0 +1,37 @@
+﻿namespace ObservableModelGeneratorUnitTests.Models;
+
+public class RootModel
+{
+    public string Name { get; set; } = string.Empty;
+
+    public string? Description { get; set; } = null;
+
+    public int NumberA { get; set; } = 0;
+
+    public int? NumberB { get; set; } = null;
+
+    public LeafModel LeafA { get; set; } = new LeafModel();
+
+    public LeafModel? LeafB { get; set; } = null;
+
+    public List<string> StringListA { get; set; } = [];
+
+    public List<string>? StringListB { get; set; } = null;
+
+    public List<int> IntListA { get; set; } = [];
+
+    public List<int>? IntListB { get; set; } = null;
+
+    public List<LeafModel> ModelListA { get; set; } = [];
+
+    public List<LeafModel>? ModelListB { get; set; } = null;
+
+    public string TitelOtherName { get; set; } = string.Empty;
+
+    public List<LeafModel> ListOtherName { get; set; } = [];
+
+    public int LambdaInt { get; set; } = 0;
+
+    public List<string> LambdaList { get; set; } = [];
+
+}
