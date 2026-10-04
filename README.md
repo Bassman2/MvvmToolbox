@@ -36,7 +36,7 @@ using ObservableModelGeneratorUnitTests.Models;
 
 namespace Demo.ViewModels;
 
-[ObservableModelObject(typeof(RootModel))]
+[ObservableModelObject(typeof(DemoModel))]
 public partial class DemoViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -63,7 +63,7 @@ using ObservableModelGeneratorUnitTests.Models;
 
 namespace Demo.ViewModels;
 
-[ObservableModelObject(typeof(RootModel))]
+[ObservableModelObject(typeof(DemoModel))]
 public partial class DemoViewModel : ObservableObject
 {
     [ObservableProperty]
@@ -71,6 +71,45 @@ public partial class DemoViewModel : ObservableObject
     public partial string FirstName { get; set; }
 }
 ```
+## Children
+Synchronizing properties with children between Model and ViewModel.
+#### Model
+```
+namespace Demo.Models;
 
+public class RootModel
+{
+    public LeafModel? Leaf { get; set; } = new LeafModel();
+}
+
+public class LeafModel
+{
+    public string Name { get; set; } = "Peter";
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(RootModel))]
+public partial class RootViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty]
+    public partial LeafViewModel? Leaf { get; set; }
+}
+
+[ObservableModelObject(typeof(LeafModel))]
+public partial class LeafViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty]
+    public partial string Name { get; set; }
+}
+```
 
 
