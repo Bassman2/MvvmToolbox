@@ -9,16 +9,13 @@ namespace ObservableModelGeneratorUnitTests;
 [TestClass]
 public sealed class ObservableModelGeneratorTests
 {
+    #region Simple
+
     readonly string Name = "New Name";
     readonly string Description = "New Description";
     readonly int Number = 15;
     readonly int No = 20;
-
-    readonly List<string> Names = ["Peter", "Paul"];
-    readonly List<string> Descriptions = ["Butcher", "Baker"];
-    readonly List<int> Numbers = [15, 20, 30];
-    readonly List<int> Nos = [20, 30, 40];
-
+    
     [TestMethod]
     public void SimpleTest()
     {
@@ -62,6 +59,15 @@ public sealed class ObservableModelGeneratorTests
         Assert.AreEqual(Number, model.Number, nameof(model.Number));
         Assert.AreEqual(No, model.No, nameof(model.No));
     }
+
+    #endregion
+
+    #region List Simple
+
+    readonly List<string> Names = ["Peter", "Paul"];
+    readonly List<string> Descriptions = ["Butcher", "Baker"];
+    readonly List<int> Numbers = [15, 20, 30];
+    readonly List<int> Nos = [20, 30, 40];
 
     [TestMethod]
     public void ListSimpleTest()
@@ -107,121 +113,21 @@ public sealed class ObservableModelGeneratorTests
         CollectionAssert.AreEqual(Nos, model.Nos, nameof(model.Nos));
     }
 
-    /*
-    [TestMethod]
-    public void TestStringProperty()
-    {
-        var model = new RootModel { Name = "Test", Description = "Test description" };
-        var viewModel = new RootViewModel(model);
-        viewModel.Name = "New Name";
-        viewModel.Description = "New Description";
+    #endregion
 
-        Assert.AreEqual("New Name", model.Name, nameof(model.Name));
-        Assert.AreEqual("New Description", model.Description, nameof(model.Description));
-    }
+    #region Tree
 
-    [TestMethod]
-    public void TestStringDifferentNameProperty()
-    {
-        var model = new RootModel { NameDiff = "Test", DescriptionDiff = "Test description" };
-        var viewModel = new RootViewModel(model);
-        viewModel.NameDifferent = "New Name";
-        viewModel.DescriptionDifferent = "New Description";
+    #endregion
 
-        Assert.AreEqual("New Name", model.NameDiff, nameof(model.NameDiff));
-        Assert.AreEqual("New Description", model.DescriptionDiff, nameof(model.DescriptionDiff));
-    }
+    #region List Tree
 
-    [TestMethod]
-    public void TestIntProperty()
-    {
-        var model = new RootModel { NumberA = 10, NumberB = null };
-        var viewModel = new RootViewModel(model);
-        viewModel.NumberA = 20;
-        viewModel.NumberB = 30;
+    #endregion
 
-        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
-        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
-    }
+    #region Converter
 
-    [TestMethod]
-    public void TestIntDifferentNameProperty()
-    {
-        var model = new RootModel { NumberADiff = 10, NumberBDiff = null };
-        var viewModel = new RootViewModel(model);
-        viewModel.NumberA = 20;
-        viewModel.NumberB = 30;
+    #endregion
 
-        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
-        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
-    }
-
-    //[TestMethod]
-    //public void TestRootModelProperty()
-    //{
-    //    var model = new RootModel { 
-    //        LeafA = new LeafModel { NumberA = 10, NumberB = 20 }, 
-    //        LeafB = null };
-    //    var viewModel = new RootViewModel(model);
-    //    viewModel.LeafA.NumberA = 20;
-    //    viewModel.LeafA.NumberB = 30;
-    //    viewModel.LeafB = new LeafViewModel(new LeafModel { NumberA = 40, NumberB = 50 });
-    //    viewModel.LeafB.NumberA = 40;
-    //    viewModel.LeafB.NumberB = 50;
-
-    //    Assert.IsNotNull(model.LeafB, nameof(model.LeafB));
-    //    Assert.AreEqual(20, model.LeafA.NumberA, nameof(model.LeafA.NumberA));
-    //    Assert.AreEqual(30, model.LeafA.NumberB, nameof(model.LeafA.NumberB));
-    //    Assert.AreEqual(40, model.LeafB.NumberA, nameof(model.LeafB.NumberA));
-    //    Assert.AreEqual(50, model.LeafB.NumberB, nameof(model.LeafB.NumberB));
-    //}
-
-    [TestMethod]
-    public void TestStringListProperty()
-    {
-        var model = new RootModel { StringListA = [ "TestA", "TestB" ], StringListB = null };
-        var viewModel = new RootViewModel(model);
-        viewModel.NumberA = 20;
-        viewModel.NumberB = 30;
-
-        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
-        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
-    }
-
-    [TestMethod]
-    public void TestIntListProperty()
-    {
-        var model = new RootModel { IntListA = [10, 20], IntListB = null };
-        var viewModel = new RootViewModel(model);
-        viewModel.NumberA = 20;
-        viewModel.NumberB = 30;
-
-        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
-        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
-    }
-
-    [TestMethod]
-    public void TestModelListProperty()
-    {
-        var model = new RootModel { ModelListA = [ new LeafModel(), new LeafModel()], ModelListB = null };
-        var viewModel = new RootViewModel(model);
-        viewModel.NumberA = 20;
-        viewModel.NumberB = 30;
-
-        Assert.AreEqual(20, model.NumberA, nameof(model.NumberA));
-        Assert.AreEqual(30, model.NumberB, nameof(model.NumberB));
-    }
-    */
-
-    //private static ObservableCollection<T> ReplaceAll<T>(ObservableCollection<T> collection, IEnumerable<T> items)
-    //{
-    //    collection.Clear();
-    //    foreach (var item in items)
-    //    {
-    //        collection.Add(item);
-    //    }
-    //    return collection;
-    //}
+    #region Helper
 
     private static void ReplaceAll<T>(ObservableCollection<T> collection, IEnumerable<T> items)
     {
@@ -231,5 +137,7 @@ public sealed class ObservableModelGeneratorTests
             collection.Add(item);
         }
     }
+
+    #endregion
 }
 
