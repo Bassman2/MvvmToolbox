@@ -44,6 +44,33 @@ public partial class DemoViewModel : ObservableObject
     public partial string Name { get; set; }
 }
 ```
+## List of Simple Types
+Synchronizing properties with a list of simple data types between the Model and the ViewModel.
+#### Model
+```
+namespace Demo.Models;
+
+public class DemoModel
+{
+    public List<string> Names { get; set; } = [ "Peter", "Paul", "Mary"];
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(DemoModel))]
+public partial class DemoViewModel : ObservableObject
+{
+    // no [ObservableProperty]
+    [ObservableModelProperty]
+    public partial ObservableCollection<string> Names { get; }
+}
+```
 ## Different Names
 Synchronizing properties with different names between Model and ViewModel.
 #### Model
