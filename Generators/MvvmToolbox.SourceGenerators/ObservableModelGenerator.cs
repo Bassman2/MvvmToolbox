@@ -104,7 +104,7 @@ public partial class ObservableModelGenerator : Generator
             {
                 DataType dataType = GetDataType(cl, prop, propAttr);
                 string modelPropertyName = propAttr.ConstructorArguments.FirstOrDefault()?.Value ?? prop.Name;
-                string viewModelPropertyType = prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName;
+                string viewModelPropertyType = (prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName).TrimEnd('?');
 
                 sb.AppendLine(CreateConstructorLine(dataType, prop.Name, viewModelPropertyType, modelPropertyName, null));
             }
@@ -123,7 +123,7 @@ public partial class ObservableModelGenerator : Generator
             {
                 DataType dataType = GetDataType(cl, prop, propAttr);
                 string modelPropertyName = propAttr.ConstructorArguments.FirstOrDefault()?.Value ?? prop.Name;
-                string viewModelPropertyType = prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName;
+                string viewModelPropertyType = (prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName); //.TrimEnd('?');
 
                 sb.AppendLine(CreateSetterMethods(dataType, prop.Name, viewModelPropertyType, modelPropertyName, null));
             }
@@ -163,19 +163,27 @@ public partial class ObservableModelGenerator : Generator
         }
         else
         {
-            return DataType.Simple;
+            if (prop.Type.ImplementsInterface("System.ComponentModel.INotifyPropertyChanged"))
+            {
+                return DataType.Model;
+            }
+            else
+            {
+                return DataType.Simple;
+            }
         }
     }
     
     public string CreateConstructorLine(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? getter)
     {
-        return dataType switch
+        return $"        // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName}\r\n" +
+            dataType switch
         {
             DataType.Error => string.Empty,
             DataType.Simple =>      
                 $"        {viewModelPropertyName} = model.{modelPropertyName};",
             DataType.Model =>       
-                $"        {viewModelPropertyName} = new {viewModelPropertyType}(model.{modelPropertyName});",
+                $"        {viewModelPropertyName} = new {viewModelPropertyType}(model.{modelPropertyName}) ?? new {viewModelPropertyType}(new ());",
             DataType.List =>        
                 $$"""
                         {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}];
@@ -183,7 +191,7 @@ public partial class ObservableModelGenerator : Generator
                 """,
             DataType.ModelList =>   
                 $$"""
-                        {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {viewModelPropertyType}(m))];
+                        {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {{viewModelPropertyType}}(m))];
                         {{viewModelPropertyName}}.CollectionChanged += On{{viewModelPropertyName}}CollectionChanged;
                 """,
             DataType.Lambda => 
@@ -290,7 +298,7 @@ public partial class ObservableModelGenerator : Generator
                              break;
                          case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                              Model.{{modelPropertyName}}.Clear();
-                             foreach ({{viewModelPropertyType}} vm in {{modelPropertyName}})
+                             foreach ({{viewModelPropertyType}} vm in {{viewModelPropertyName}})
                              {
                                  Model.{{modelPropertyName}}.Add(vm.Model);
                              }

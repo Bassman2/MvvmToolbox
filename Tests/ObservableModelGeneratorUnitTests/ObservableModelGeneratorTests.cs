@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0017 
+﻿//#pragma warning disable IDE0017 
 
 using ObservableModelGeneratorUnitTests.Models;
 using ObservableModelGeneratorUnitTests.ViewModels;
