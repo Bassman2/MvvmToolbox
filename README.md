@@ -8,3 +8,11 @@ Code Generator to fill a ViewModel tree with the date of a Model tree and update
 | simple types | simple types | e.q. (string, int, float, ...) |
 | `List<S>` | `ObservableCollection<S>` | where S is a simple Type |
 | `List<M>` | `ObservableCollection<VM>` | VM is the corresponding ViewModel to the Model M |
+
+# Installation
+
+[Nuget package](https://www.nuget.org/packages/MvvmToolbox)
+
+```
+dotnet add package MvvmToolbox
+```
