@@ -138,5 +138,45 @@ public partial class LeafViewModel : ObservableObject
     public partial string Name { get; set; }
 }
 ```
+## List of Children
+Synchronizing properties with a list of children between Model and ViewModel.
+#### Model
+```
+namespace Demo.Models;
+
+public class RootModel
+{
+    public List<LeafModel> Leafs { get; set; } = [new LeafModel(), new LeafModel()];
+}
+
+public class LeafModel
+{
+    public string Name { get; set; } = "Peter";
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(RootModel))]
+public partial class RootViewModel : ObservableObject
+{
+    // no [ObservableProperty]
+    [ObservableModelProperty]
+    public partial ObservableCollection<LeafViewModel> Leafs { get; }
+}
+
+[ObservableModelObject(typeof(LeafModel))]
+public partial class LeafViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty]
+    public partial string Name { get; set; }
+}
+```
 
 
