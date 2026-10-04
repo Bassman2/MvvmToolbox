@@ -5,15 +5,15 @@ public partial class TreeRootDiffNameViewModel : ObservableObject
 {
     [ObservableProperty]
     [ObservableModelProperty("Child")]
-    public partial TreeLeaveViewModel DiffChild { get; set; }
+    public partial TreeLeafViewModel DiffChild { get; set; }
 
     [ObservableProperty]
-    [ObservableModelProperty("Leave")]
-    public partial TreeLeaveViewModel? DiffLeave { get; set; }
+    [ObservableModelProperty("Leaf")]
+    public partial TreeLeafViewModel DiffLeaf { get; set; }
 
     [ObservableModelProperty("Children")]
-    public ObservableCollection<TreeLeaveViewModel> DiffChildren { get; }
+    public ObservableCollection<TreeLeafViewModel> DiffChildren { get; }
 
     [ObservableModelProperty("Leaves")]
-    public ObservableCollection<TreeLeaveViewModel> DiffLeaves { get; }
+    public ObservableCollection<TreeLeafViewModel> DiffLeaves { get; }
 }

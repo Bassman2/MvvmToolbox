@@ -1,7 +1,7 @@
 ﻿namespace ObservableModelGeneratorUnitTests.ViewModels;
 
-[ObservableModelObject(typeof(TreeLeaveModel))]
-public partial class TreeLeaveViewModel : ObservableObject
+[ObservableModelObject(typeof(TreeLeafModel))]
+public partial class TreeLeafViewModel : ObservableObject
 {
     [ObservableProperty]
     [ObservableModelProperty]

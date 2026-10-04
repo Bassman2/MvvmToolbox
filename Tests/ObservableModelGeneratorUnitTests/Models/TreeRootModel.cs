@@ -2,8 +2,8 @@
 
 public class TreeRootModel
 {
-    public TreeLeaveModel Child { get; set; } = new TreeLeaveModel();
-    public TreeLeaveModel? Leave { get; set; } = null;
-    public List<TreeLeaveModel> Children { get; set; } = [];
-    public List<TreeLeaveModel>? Leaves { get; set; } = [];
+    public TreeLeafModel Child { get; set; } = new TreeLeafModel();
+    public TreeLeafModel? Leaf { get; set; } = null;
+    public List<TreeLeafModel> Children { get; set; } = [];
+    public List<TreeLeafModel>? Leaves { get; set; } = [];
 }

@@ -117,11 +117,77 @@ public sealed class ObservableModelGeneratorTests
 
     #region Tree
 
+    readonly string initChildName = "Peter";
+    readonly string testChildName = "Paul";
+
+    //readonly string initLeafName = "Mary";
+    readonly string testLeafName = "Paris";
+
+    readonly List<TreeLeafModel> initChildrenNames = [new TreeLeafModel("Peter"), new TreeLeafModel("Mary")];
+    readonly List<TreeLeafModel> testChildrenNames = [new TreeLeafModel("Paul"), new TreeLeafModel("Paris")];
+
+    //readonly List<TreeLeafModel> initLeavesNames = [new TreeLeafModel("A1"), new TreeLeafModel("A2")];
+    readonly List<TreeLeafModel> testLeavesNames = [new TreeLeafModel("B1"), new TreeLeafModel("B2")];
+
+    [TestMethod]
+    public void TreeTest()
+    {
+        var model = new TreeRootModel {
+            Child = new TreeLeafModel(initChildName),
+            Leaf = null,
+            Children = initChildrenNames,
+            Leaves = null};
+        var viewModel = new TreeRootViewModel(model);
+
+        Assert.AreEqual(initChildName, viewModel.Child.Name, nameof(viewModel.Child));
+        Assert.AreEqual(string.Empty, viewModel.Leaf.Name, nameof(viewModel.Leaf));
+        CollectionAssert.AreEqual(initChildrenNames.Select(i => i.Name).ToList(), viewModel.Children.Select(i => i.Name).ToList(), nameof(viewModel.Children));
+        CollectionAssert.AreEqual(Array.Empty<string>(), viewModel.Leaves.Select(i => i.Name).ToList(), nameof(viewModel.Leaves));
+
+        viewModel.Child.Name = testChildName;
+        viewModel.Leaf.Name = testLeafName;
+        ReplaceAll(viewModel.Children, testChildrenNames.Select(i => new TreeLeafViewModel(i)));
+        ReplaceAll(viewModel.Leaves, testLeavesNames.Select(i => new TreeLeafViewModel(i)));
+        
+        Assert.AreEqual(testChildName, model.Child.Name, nameof(model.Child));
+        Assert.AreEqual(testLeafName, model.Leaf!.Name, nameof(model.Leaf));
+        CollectionAssert.AreEqual(testChildrenNames, model.Children, nameof(model.Children));
+        CollectionAssert.AreEqual(testLeavesNames, model.Leaves, nameof(model.Leaves));
+    }
+
+    [TestMethod]
+    public void TreeDiffNameTest()
+    {
+        var model = new TreeRootModel
+        {
+            Child = new TreeLeafModel(initChildName),
+            Leaf = null,
+            Children = initChildrenNames,
+            Leaves = null
+        };
+        var viewModel = new TreeRootDiffNameViewModel(model);
+
+        Assert.AreEqual(initChildName, viewModel.DiffChild.Name, nameof(viewModel.DiffChild));
+        Assert.AreEqual(string.Empty, viewModel.DiffLeaf.Name, nameof(viewModel.DiffLeaf));
+        CollectionAssert.AreEqual(initChildrenNames.Select(i => i.Name).ToList(), viewModel.DiffChildren.Select(i => i.Name).ToList(), nameof(viewModel.DiffChildren));
+        CollectionAssert.AreEqual(Array.Empty<string>(), viewModel.DiffLeaves.Select(i => i.Name).ToList(), nameof(viewModel.DiffLeaves));
+
+        viewModel.DiffChild.Name = testChildName;
+        viewModel.DiffLeaf.Name = testLeafName;
+        ReplaceAll(viewModel.DiffChildren, testChildrenNames.Select(i => new TreeLeafViewModel(i)));
+        ReplaceAll(viewModel.DiffLeaves, testLeavesNames.Select(i => new TreeLeafViewModel(i)));
+
+        Assert.AreEqual(testChildName, model.Child.Name, nameof(model.Child));
+        Assert.AreEqual(testLeafName, model.Leaf!.Name, nameof(model.Leaf));
+        CollectionAssert.AreEqual(testChildrenNames, model.Children, nameof(model.Children));
+        CollectionAssert.AreEqual(testLeavesNames, model.Leaves, nameof(model.Leaves));
+
+
+    }
+
     #endregion
 
-    #region List Tree
 
-    #endregion
 
     #region Converter
 
@@ -130,6 +196,15 @@ public sealed class ObservableModelGeneratorTests
     #region Helper
 
     private static void ReplaceAll<T>(ObservableCollection<T> collection, IEnumerable<T> items)
+    {
+        collection.Clear();
+        foreach (var item in items)
+        {
+            collection.Add(item);
+        }
+    }
+
+    private static void ReplaceAll<T>(ObservableCollection<T> collection, params T[] items)
     {
         collection.Clear();
         foreach (var item in items)

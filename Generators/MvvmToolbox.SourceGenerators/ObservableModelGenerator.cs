@@ -183,7 +183,7 @@ public partial class ObservableModelGenerator : Generator
             DataType.Simple =>      
                 $"        {viewModelPropertyName} = model.{modelPropertyName};",
             DataType.Model =>       
-                $"        {viewModelPropertyName} = new {viewModelPropertyType}(model.{modelPropertyName}) ?? new {viewModelPropertyType}(new ());",
+                $"        {viewModelPropertyName} = model.{modelPropertyName} != null ? new {viewModelPropertyType}(model.{modelPropertyName}) : new {viewModelPropertyType}(new ());",
             DataType.List =>        
                 $$"""
                         {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}];
@@ -191,7 +191,7 @@ public partial class ObservableModelGenerator : Generator
                 """,
             DataType.ModelList =>   
                 $$"""
-                        {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {{viewModelPropertyType}}(m))];
+                        {{viewModelPropertyName}} = [.. (model.{{modelPropertyName}} ?? []).Select(m => new {{viewModelPropertyType}}(m))];
                         {{viewModelPropertyName}}.CollectionChanged += On{{viewModelPropertyName}}CollectionChanged;
                 """,
             DataType.Lambda => 
@@ -202,7 +202,8 @@ public partial class ObservableModelGenerator : Generator
 
     public string CreateSetterMethods(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? setter)
     {
-        return dataType switch
+        return $"        // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName}\r\n" +
+            dataType switch
         {
             DataType.Error => string.Empty,
             DataType.Simple =>
@@ -225,6 +226,7 @@ public partial class ObservableModelGenerator : Generator
                 $$"""
                     private void On{{viewModelPropertyName}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
                     {
+                        Model.{{modelPropertyName}} ??= [];
                         switch (e.Action)
                         {
                         case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
@@ -261,11 +263,12 @@ public partial class ObservableModelGenerator : Generator
                             break;
                         }   
                     }
-                """,
+                 """,
             DataType.ModelList =>
                 $$"""
                      private void On{{viewModelPropertyName}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
                      {
+                        Model.{{modelPropertyName}} ??= [];
                          switch (e.Action)
                          {
                          case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
@@ -275,20 +278,17 @@ public partial class ObservableModelGenerator : Generator
                                  Model.{{modelPropertyName}}.Insert(index++, vm.Model);
                              }
                              break;
-
                          case System.Collections.Specialized.NotifyCollectionChangedAction.Remove when e.OldItems != null:
                              foreach ({{viewModelPropertyType}} vm in e.OldItems)
                              {
                                   Model.{{modelPropertyName}}.Remove(vm.Model);
                              }
                              break;
-
                          case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
                              var modelToMove =  Model.{{modelPropertyName}}[e.OldStartingIndex];
                              Model.{{modelPropertyName}}.RemoveAt(e.OldStartingIndex);
                              Model.{{modelPropertyName}}.Insert(e.NewStartingIndex, modelToMove);
                              break;
-
                          case System.Collections.Specialized.NotifyCollectionChangedAction.Replace when e.NewItems != null:
                              int replaceIndex = e.NewStartingIndex;
                              foreach ({{viewModelPropertyType}} vm in e.NewItems)

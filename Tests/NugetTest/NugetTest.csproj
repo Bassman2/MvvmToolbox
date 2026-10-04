@@ -7,12 +7,12 @@
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
     <InvariantGlobalization>true</InvariantGlobalization>
-    <Version>0.1.0.0</Version>
+    <Version>0.2.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="MvvmToolbox" Version="0.1.0" />
+    <PackageReference Include="MvvmToolbox" Version="0.2.0" />
   </ItemGroup>
 
 </Project>

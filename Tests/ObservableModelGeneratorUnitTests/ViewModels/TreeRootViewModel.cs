@@ -5,15 +5,15 @@ public partial class TreeRootViewModel : ObservableObject
 {
     [ObservableProperty]
     [ObservableModelProperty]
-    public partial TreeLeaveViewModel Child { get; set; }
+    public partial TreeLeafViewModel Child { get; set; }
 
     [ObservableProperty]
     [ObservableModelProperty]
-    public partial TreeLeaveViewModel? Leave { get; set; }
+    public partial TreeLeafViewModel Leaf { get; set; }
 
     [ObservableModelProperty]
-    public ObservableCollection<TreeLeaveViewModel> Children { get; }
+    public ObservableCollection<TreeLeafViewModel> Children { get; }
 
     [ObservableModelProperty]
-    public ObservableCollection<TreeLeaveViewModel> Leaves { get; }
+    public ObservableCollection<TreeLeafViewModel> Leaves { get; }
 }
