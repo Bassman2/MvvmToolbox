@@ -59,9 +59,9 @@ namespace Demo.ViewModels;
 [ObservableModelObject(typeof(DemoModel))]
 public partial class DemoViewModel : ObservableObject
 {
-    // no [ObservableProperty]
+    // no partial and no [ObservableProperty]
     [ObservableModelProperty]
-    public partial ObservableCollection<string> Names { get; }
+    public ObservableCollection<string> Names { get; }
 }
 ```
 ## Different Names
@@ -158,9 +158,9 @@ namespace Demo.ViewModels;
 [ObservableModelObject(typeof(RootModel))]
 public partial class RootViewModel : ObservableObject
 {
-    // no [ObservableProperty]
+    // no partial and no [ObservableProperty]
     [ObservableModelProperty]
-    public partial ObservableCollection<LeafViewModel> Leafs { get; }
+    public ObservableCollection<LeafViewModel> Leafs { get; }
 }
 
 [ObservableModelObject(typeof(LeafModel))]
