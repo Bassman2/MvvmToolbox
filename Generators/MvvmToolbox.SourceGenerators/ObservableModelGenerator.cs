@@ -63,24 +63,9 @@ public partial class ObservableModelGenerator : Generator
                     ModelPropertyName = modelPropertyName;
                 }
 
-                public ObservableModelPropertyAttribute(string getter, string setter)
-                {
-                    Getter = getter;
-                    Setter = setter;
-                }
-
-                public ObservableModelPropertyAttribute(string modelPropertyName, string getter, string setter)
-                {
-                    ModelPropertyName = modelPropertyName;
-                    Getter = getter;
-                    Setter = setter;
-                }
-
                 public string? ModelPropertyName { get; } = null; 
-                public string? Getter { get; } = null; 
-                public string? Setter { get; } = null; 
+                public string? Converter { get; init; }
             }
-
             """);
     }
 

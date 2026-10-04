@@ -1,4 +1,5 @@
 ﻿### New Rules
+
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-MTSG001 | Design   | Error    | Missing partial modifier
+MTSG002 | Usage    | Error    | Missing partial property modifier

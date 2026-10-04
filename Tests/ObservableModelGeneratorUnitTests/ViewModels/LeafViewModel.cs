@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MvvmToolbox.ComponentModel;
 using ObservableModelGeneratorUnitTests.Models;
 
@@ -14,4 +15,9 @@ public partial class LeafViewModel : ObservableObject
     [ObservableProperty]
     [ObservableModelProperty]
     public partial int? NumberB { get; set; }
+
+    [RelayCommand]
+    private void DoSomething()
+    {
+    }
 }
