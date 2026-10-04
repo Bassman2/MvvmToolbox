@@ -16,3 +16,32 @@ Code Generator to fill a ViewModel tree with the date of a Model tree and update
 ```
 dotnet add package MvvmToolbox
 ```
+# Examples
+## Simple Types
+#### Model
+```
+namespace Demo.Models;
+
+public class DemoModel
+{
+    public string Name { get; set; } = "Peter";
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(RootModel))]
+public partial class DemoViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty]
+    public partial string Name { get; set; }
+}
+```
+
+
