@@ -18,6 +18,7 @@ dotnet add package MvvmToolbox
 ```
 # Examples
 ## Simple Types
+Synchronizing properties with simple data types between the Model and the ViewModel.
 #### Model
 ```
 namespace Demo.Models;
@@ -43,5 +44,33 @@ public partial class DemoViewModel : ObservableObject
     public partial string Name { get; set; }
 }
 ```
+## Different Names
+Synchronizing properties with different names between Model and ViewModel.
+#### Model
+```
+namespace Demo.Models;
+
+public class DemoModel
+{
+    public string Name { get; set; } = "Peter";
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(RootModel))]
+public partial class DemoViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty(nameof(DemoModel.Name))]
+    public partial string FirstName { get; set; }
+}
+```
+
 
 
