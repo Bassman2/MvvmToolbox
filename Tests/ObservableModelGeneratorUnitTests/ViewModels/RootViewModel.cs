@@ -1,13 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using MvvmToolbox.ComponentModel;
-using ObservableModelGeneratorUnitTests.Models;
-
-namespace ObservableModelGeneratorUnitTests.ViewModels;
+﻿namespace ObservableModelGeneratorUnitTests.ViewModels;
 
 
 [ObservableModelObject(typeof(RootModel))]
 public partial class RootViewModel : ObservableObject
 {
+    // TestStringProperty
+
     [ObservableProperty]
     [ObservableModelProperty]
     public partial string Name { get; set; }
@@ -15,6 +13,14 @@ public partial class RootViewModel : ObservableObject
     [ObservableProperty]
     [ObservableModelProperty]
     public partial string? Description { get; set; }
+
+    [ObservableProperty]
+    [ObservableModelProperty("NameDiff")]
+    public partial string NameDifferent { get; set; }
+
+    [ObservableProperty]
+    [ObservableModelProperty("DescriptionDiff")]
+    public partial string? DescriptionDifferent { get; set; }
 
     [ObservableProperty]
     [ObservableModelProperty]

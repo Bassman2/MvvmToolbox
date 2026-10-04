@@ -2,13 +2,31 @@
 
 public class RootModel
 {
+    // TestStringProperty
+
     public string Name { get; set; } = string.Empty;
 
     public string? Description { get; set; } = null;
 
+    // TestStringDifferentNameProperty
+
+    public string NameDiff { get; set; } = string.Empty;
+
+    public string? DescriptionDiff { get; set; } = null;
+
+    // TestIntProperty
+
     public int NumberA { get; set; } = 0;
 
     public int? NumberB { get; set; } = null;
+
+    //TestIntDifferentNameProperty
+
+    public int NumberADiff { get; set; } = 0;
+
+    public int? NumberBDiff { get; set; } = null;
+
+    //
 
     public LeafModel LeafA { get; set; } = new LeafModel();
 

@@ -173,21 +173,21 @@ public partial class ObservableModelGenerator : Generator
         {
             DataType.Error => string.Empty,
             DataType.Simple =>      
-                $"    {viewModelPropertyName} = model.{modelPropertyName};",
+                $"        {viewModelPropertyName} = model.{modelPropertyName};",
             DataType.Model =>       
-                $"    {viewModelPropertyName} = new {viewModelPropertyType}(model.{modelPropertyName});",
+                $"        {viewModelPropertyName} = new {viewModelPropertyType}(model.{modelPropertyName});",
             DataType.List =>        
                 $$"""
-                    {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}];
-                    {{viewModelPropertyName}}.CollectionChanged += On{{modelPropertyName}}
+                        {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}];
+                        {{viewModelPropertyName}}.CollectionChanged += On{{viewModelPropertyName}}CollectionChanged;
                 """,
             DataType.ModelList =>   
                 $$"""
-                    {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {viewModelPropertyType}(m))];
-                    {{viewModelPropertyName}}.CollectionChanged += On{{modelPropertyName}}
+                        {{viewModelPropertyName}} = [.. model.{{modelPropertyName}}.Select(m => new {viewModelPropertyType}(m))];
+                        {{viewModelPropertyName}}.CollectionChanged += On{{viewModelPropertyName}}CollectionChanged;
                 """,
             DataType.Lambda => 
-                $"    {viewModelPropertyName} = {getter};",
+                $"        {viewModelPropertyName} = {getter};",
             _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
         };
     }
