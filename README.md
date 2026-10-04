@@ -2,13 +2,6 @@
 
 Code Generator to fill a ViewModel tree with the date of a Model tree and updates the model tree on ViewModel tree changes.
 
-
-| Mode Property Data Type | ViewModel Property Data Type | Comment |
-| --- | --- | --- |
-| simple types | simple types | e.q. (string, int, float, ...) |
-| `List<S>` | `ObservableCollection<S>` | where S is a simple Type |
-| `List<M>` | `ObservableCollection<VM>` | VM is the corresponding ViewModel to the Model M |
-
 # Installation
 
 [Nuget package](https://www.nuget.org/packages/MvvmToolbox)
