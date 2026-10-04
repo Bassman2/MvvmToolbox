@@ -171,5 +171,34 @@ public partial class LeafViewModel : ObservableObject
     public partial string Name { get; set; }
 }
 ```
+## Converter
+Synchronizing properties with converters between the Model and the ViewModel.
+#### Model
+```
+namespace Demo.Models;
 
+public class DemoModel
+{
+    public int Num { get; set; } = 25;
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(DemoModel))]
+public partial class DemoViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty(ConverterName:"NumConvert")]
+    public partial string Num { get; set; }
+
+    partial string GetNumConvert(int val) => val.ToString();
+    partial int SetNumConvert(string val) => int.Parse(val);
+}
+```
 
