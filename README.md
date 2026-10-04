@@ -173,6 +173,7 @@ public partial class LeafViewModel : ObservableObject
 ```
 ## Converter
 Synchronizing properties with converters between the Model and the ViewModel.
+The converters can also be applied to lists and "list to simpleType" mappings.
 #### Model
 ```
 namespace Demo.Models;
