@@ -1,6 +1,6 @@
 # MvvmToolkit
 
-Code Generator to fill a ViewModel tree with the date of a Model tree and updates the model tree on ViewModel tree changes.
+Code generator that populates a ViewModel tree with data from a model tree and updates the model tree when changes are made to the ViewModel tree.
 
 # Installation
 
