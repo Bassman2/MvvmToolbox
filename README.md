@@ -2,6 +2,15 @@
 
 Code generator that populates a ViewModel tree with data from a model tree and updates the model tree when changes are made to the ViewModel tree.
 
+# Features
+* Roslyn Code Generator
+* Mapping between Model and ViewModel trees
+* Custom converters
+* AOT-compatible
+* Trimmable
+* CommunityToolkit.Mvvm compatible.
+* WPF, WinUI, and Avalonia compatible.
+
 # Installation
 
 [Nuget package](https://www.nuget.org/packages/MvvmToolbox)
@@ -11,7 +20,7 @@ dotnet add package MvvmToolbox
 ```
 # Examples
 ## Simple Types
-Synchronizing properties with simple data types between the Model and the ViewModel.
+Synchronizing properties with simple data types between the Model and the ViewModel. 
 #### Model
 ```
 namespace Demo.Models;
