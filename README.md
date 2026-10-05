@@ -180,7 +180,7 @@ public partial class LeafViewModel : ObservableObject
     public partial string Name { get; set; }
 }
 ```
-## Converter
+## Converter Functions
 Synchronizing properties with converters between the Model and the ViewModel.
 The converters can also be applied to lists and "list to simpleType" mappings.
 #### Model
@@ -204,11 +204,49 @@ namespace Demo.ViewModels;
 public partial class DemoViewModel : ObservableObject
 {
     [ObservableProperty]
-    [ObservableModelProperty(Converter = "NumConvert", ModelType = "int")]
+    [ObservableModelProperty(Converter = "NumConvert")]
     public partial string Num { get; set; }
 
-    private static partial string GetNumConvert(int val) => val.ToString();
-    private static partial int SetNumConvert(string val) => int.Parse(val);
+    private string GetNumConvert(int val) => val.ToString();
+    private int SetNumConvert(string val) => int.Parse(val);
+}
+```
+
+## Converter Interface
+Synchronizing properties with converters between the Model and the ViewModel.
+The converters can also be applied to lists and "list to simpleType" mappings.
+#### Model
+```
+namespace Demo.Models;
+
+public class DemoModel
+{
+    public int Num { get; set; } = 25;
+}
+```
+#### ViewModel
+```
+using CommunityToolkit.Mvvm.ComponentModel;
+using MvvmToolbox.ComponentModel;
+using ObservableModelGeneratorUnitTests.Models;
+
+namespace Demo.ViewModels;
+
+[ObservableModelObject(typeof(DemoModel))]
+public partial class DemoViewModel : ObservableObject
+{
+    [ObservableProperty]
+    [ObservableModelProperty(ConverterType = typeof(IntToStringConverter))]
+    public partial string Num { get; set; }
+
+    private string GetNumConvert(int val) => val.ToString();
+    private int SetNumConvert(string val) => int.Parse(val);
+
+    public class IntToStringConverter : IPropertyConverter
+    {
+        public object Convert(object value) => value?.ToString()!;
+        public object ConvertBack(object value) => (value is string input && int.TryParse(input, out int result)) ? result : null!;
+    }
 }
 ```
 
