@@ -227,18 +227,18 @@ public partial class ObservableModelGenerator : Generator
                     $"        {propertyData.ViewModelPropertyName} = model.{propertyData.ModelPropertyName} != null ? new {propertyData.ViewModelPropertyType.TrimEnd('?')}(model.{propertyData.ModelPropertyName}) : new {propertyData.ViewModelPropertyType.TrimEnd('?')}(new ());",
                 DataType.List =>
                     $$"""
-                        {{propertyData.ViewModelPropertyName}} = [.. model.{{propertyData.ModelPropertyName}}];
-                        {{propertyData.ViewModelPropertyName}}.CollectionChanged += On{{propertyData.ViewModelPropertyName}}CollectionChanged;
-                """,
+                            {{propertyData.ViewModelPropertyName}} = [.. model.{{propertyData.ModelPropertyName}}];
+                            {{propertyData.ViewModelPropertyName}}.CollectionChanged += On{{propertyData.ViewModelPropertyName}}CollectionChanged;
+                    """,
                 DataType.ModelList =>
                     $$"""
-                        {{propertyData.ViewModelPropertyName}} = [.. (model.{{propertyData.ModelPropertyName}} ?? []).Select(m => new {{propertyData.ViewModelPropertyType.TrimEnd('?')}}(m))];
-                        {{propertyData.ViewModelPropertyName}}.CollectionChanged += On{{propertyData.ViewModelPropertyName}}CollectionChanged;
-                """,
+                            {{propertyData.ViewModelPropertyName}} = [.. (model.{{propertyData.ModelPropertyName}} ?? []).Select(m => new {{propertyData.ViewModelPropertyType.TrimEnd('?')}}(m))];
+                            {{propertyData.ViewModelPropertyName}}.CollectionChanged += On{{propertyData.ViewModelPropertyName}}CollectionChanged;
+                    """,
                 DataType.ConverterFunc =>
                     $"        {propertyData.ViewModelPropertyName} = Get{propertyData.Converter}(model.{propertyData.ModelPropertyName});",
                 DataType.ConverterClass =>
-               $"        {propertyData.ViewModelPropertyName} = ({propertyData.ViewModelPropertyType.TrimEnd('?')})(new {propertyData.Converter}()).Convert(model.{propertyData.ModelPropertyName});",
+                    $"        {propertyData.ViewModelPropertyName} = ({propertyData.ViewModelPropertyType.TrimEnd('?')})(new {propertyData.Converter}()).Convert(model.{propertyData.ModelPropertyName});",
                 _ => throw new ArgumentOutOfRangeException(nameof(propertyData.DataType), propertyData.DataType, null)
             };
     }
