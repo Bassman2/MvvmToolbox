@@ -251,118 +251,118 @@ public partial class ObservableModelGenerator : Generator
                 DataType.Error => string.Empty,
                 DataType.Simple =>
                     $$"""
-                    partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
-                    {
-                        Model.{{propertyData.ModelPropertyName}} = value;
-                    }
+                        partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
+                        {
+                            Model.{{propertyData.ModelPropertyName}} = value;
+                        }
 
-                """,
+                    """,
                 DataType.Model =>
                     $$"""
-                    partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
-                    {
-                        Model.{{propertyData.ModelPropertyName}} = value.Model;
-                    }
+                        partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
+                        {
+                            Model.{{propertyData.ModelPropertyName}} = value.Model;
+                        }
 
-                """,
+                    """,
                 DataType.List =>
                     $$"""
-                    private void On{{propertyData.ViewModelPropertyName}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-                    {
-                        Model.{{propertyData.ModelPropertyName}} ??= [];
-                        switch (e.Action)
+                        private void On{{propertyData.ViewModelPropertyName}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
                         {
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
-                            int index = e.NewStartingIndex;
-                            foreach ({{propertyData.ViewModelPropertyType}} item in e.NewItems)
+                            Model.{{propertyData.ModelPropertyName}} ??= [];
+                            switch (e.Action)
                             {
-                                Model.{{propertyData.ModelPropertyName}}.Insert(index++, item);
-                            }
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Remove when e.OldItems != null:
-                            foreach ({{propertyData.ViewModelPropertyType}} item in e.OldItems)
-                            {
-                                 Model.{{propertyData.ModelPropertyName}}.Remove(item);
-                            }
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                            var modelToMove =  Model.{{propertyData.ModelPropertyName}}[e.OldStartingIndex];
-                            Model.{{propertyData.ModelPropertyName}}.RemoveAt(e.OldStartingIndex);
-                            Model.{{propertyData.ModelPropertyName}}.Insert(e.NewStartingIndex, modelToMove);
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Replace when e.NewItems != null:
-                            int replaceIndex = e.NewStartingIndex;
-                            foreach ({{propertyData.ViewModelPropertyType}} item in e.NewItems)
-                            {
-                                Model.{{propertyData.ModelPropertyName}}[replaceIndex++] = item;
-                            }
-                            break;
-                        case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                            Model.{{propertyData.ModelPropertyName}}.Clear();
-                            foreach ({{propertyData.ViewModelPropertyType}} item in {{propertyData.ViewModelPropertyName}})
-                            {
-                                Model.{{propertyData.ModelPropertyName}}.Add(item);
-                            }
-                            break;
-                        }   
-                    }
-                 """,
+                            case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
+                                int index = e.NewStartingIndex;
+                                foreach ({{propertyData.ViewModelPropertyType}} item in e.NewItems)
+                                {
+                                    Model.{{propertyData.ModelPropertyName}}.Insert(index++, item);
+                                }
+                                break;
+                            case System.Collections.Specialized.NotifyCollectionChangedAction.Remove when e.OldItems != null:
+                                foreach ({{propertyData.ViewModelPropertyType}} item in e.OldItems)
+                                {
+                                     Model.{{propertyData.ModelPropertyName}}.Remove(item);
+                                }
+                                break;
+                            case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                                var modelToMove =  Model.{{propertyData.ModelPropertyName}}[e.OldStartingIndex];
+                                Model.{{propertyData.ModelPropertyName}}.RemoveAt(e.OldStartingIndex);
+                                Model.{{propertyData.ModelPropertyName}}.Insert(e.NewStartingIndex, modelToMove);
+                                break;
+                            case System.Collections.Specialized.NotifyCollectionChangedAction.Replace when e.NewItems != null:
+                                int replaceIndex = e.NewStartingIndex;
+                                foreach ({{propertyData.ViewModelPropertyType}} item in e.NewItems)
+                                {
+                                    Model.{{propertyData.ModelPropertyName}}[replaceIndex++] = item;
+                                }
+                                break;
+                            case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                                Model.{{propertyData.ModelPropertyName}}.Clear();
+                                foreach ({{propertyData.ViewModelPropertyType}} item in {{propertyData.ViewModelPropertyName}})
+                                {
+                                    Model.{{propertyData.ModelPropertyName}}.Add(item);
+                                }
+                                break;
+                            }   
+                        }
+                     """,
                 DataType.ModelList =>
                     $$"""
-                     private void On{{propertyData.ViewModelPropertyName}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-                     {
-                        Model.{{propertyData.ModelPropertyName}} ??= [];
-                         switch (e.Action)
+                         private void On{{propertyData.ViewModelPropertyName}}CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
                          {
-                         case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
-                             int index = e.NewStartingIndex;
-                             foreach ({{propertyData.ViewModelPropertyType}} vm in e.NewItems)
+                            Model.{{propertyData.ModelPropertyName}} ??= [];
+                             switch (e.Action)
                              {
-                                 Model.{{propertyData.ModelPropertyName}}.Insert(index++, vm.Model);
-                             }
-                             break;
-                         case System.Collections.Specialized.NotifyCollectionChangedAction.Remove when e.OldItems != null:
-                             foreach ({{propertyData.ViewModelPropertyType}} vm in e.OldItems)
-                             {
-                                  Model.{{propertyData.ModelPropertyName}}.Remove(vm.Model);
-                             }
-                             break;
-                         case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                             var modelToMove =  Model.{{propertyData.ModelPropertyName}}[e.OldStartingIndex];
-                             Model.{{propertyData.ModelPropertyName}}.RemoveAt(e.OldStartingIndex);
-                             Model.{{propertyData.ModelPropertyName}}.Insert(e.NewStartingIndex, modelToMove);
-                             break;
-                         case System.Collections.Specialized.NotifyCollectionChangedAction.Replace when e.NewItems != null:
-                             int replaceIndex = e.NewStartingIndex;
-                             foreach ({{propertyData.ViewModelPropertyType}} vm in e.NewItems)
-                             {
-                                 Model.{{propertyData.ModelPropertyName}}[replaceIndex++] = vm.Model;
-                             }
-                             break;
-                         case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                             Model.{{propertyData.ModelPropertyName}}.Clear();
-                             foreach ({{propertyData.ViewModelPropertyType}} vm in {{propertyData.ViewModelPropertyName}})
-                             {
-                                 Model.{{propertyData.ModelPropertyName}}.Add(vm.Model);
-                             }
-                             break;
-                         }   
-                     }
-                 """,
+                             case System.Collections.Specialized.NotifyCollectionChangedAction.Add when e.NewItems != null:
+                                 int index = e.NewStartingIndex;
+                                 foreach ({{propertyData.ViewModelPropertyType}} vm in e.NewItems)
+                                 {
+                                     Model.{{propertyData.ModelPropertyName}}.Insert(index++, vm.Model);
+                                 }
+                                 break;
+                             case System.Collections.Specialized.NotifyCollectionChangedAction.Remove when e.OldItems != null:
+                                 foreach ({{propertyData.ViewModelPropertyType}} vm in e.OldItems)
+                                 {
+                                      Model.{{propertyData.ModelPropertyName}}.Remove(vm.Model);
+                                 }
+                                 break;
+                             case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                                 var modelToMove =  Model.{{propertyData.ModelPropertyName}}[e.OldStartingIndex];
+                                 Model.{{propertyData.ModelPropertyName}}.RemoveAt(e.OldStartingIndex);
+                                 Model.{{propertyData.ModelPropertyName}}.Insert(e.NewStartingIndex, modelToMove);
+                                 break;
+                             case System.Collections.Specialized.NotifyCollectionChangedAction.Replace when e.NewItems != null:
+                                 int replaceIndex = e.NewStartingIndex;
+                                 foreach ({{propertyData.ViewModelPropertyType}} vm in e.NewItems)
+                                 {
+                                     Model.{{propertyData.ModelPropertyName}}[replaceIndex++] = vm.Model;
+                                 }
+                                 break;
+                             case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                                 Model.{{propertyData.ModelPropertyName}}.Clear();
+                                 foreach ({{propertyData.ViewModelPropertyType}} vm in {{propertyData.ViewModelPropertyName}})
+                                 {
+                                     Model.{{propertyData.ModelPropertyName}}.Add(vm.Model);
+                                 }
+                                 break;
+                             }   
+                         }
+                     """,
                 DataType.ConverterFunc =>
                     $$"""
-                    partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
-                    {
-                        Model.{{propertyData.ModelPropertyName}} = Set{{propertyData.Converter}}(value);
-                    }
-                """,
+                        partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
+                        {
+                            Model.{{propertyData.ModelPropertyName}} = Set{{propertyData.Converter}}(value);
+                        }
+                    """,
                 DataType.ConverterClass =>
-                $$"""
-                    partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
-                    {
-                        Model.{{propertyData.ModelPropertyName}} = ({{propertyData.ModelPropertyType}})new {{propertyData.Converter}}().ConvertBack({{propertyData.ViewModelPropertyName}});
-                    }
-                """,
+                    $$"""
+                        partial void On{{propertyData.ViewModelPropertyName}}Changed({{propertyData.ViewModelPropertyType}} value)
+                        {
+                            Model.{{propertyData.ModelPropertyName}} = ({{propertyData.ModelPropertyType}})new {{propertyData.Converter}}().ConvertBack({{propertyData.ViewModelPropertyName}});
+                        }
+                    """,
                 _ => throw new ArgumentOutOfRangeException(nameof(propertyData.DataType), propertyData.DataType, null)
             };
     }
