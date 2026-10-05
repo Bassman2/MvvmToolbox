@@ -187,10 +187,33 @@ public sealed class ObservableModelGeneratorTests
 
     #endregion
 
-
-
     #region Converter
 
+    [TestMethod]
+    public void ConverterTest()
+    {
+        var model = new ConverterModel { Value = 5 };
+        var viewModel = new ConverterViewModel(model);
+
+        Assert.AreEqual(model.Value.ToString(), viewModel.Value, nameof(viewModel.Value));
+
+        viewModel.Value = "20";
+
+        Assert.AreEqual(20, model.Value, nameof(model.Value));
+    }
+
+    [TestMethod]
+    public void ConverterDiffNameTest()
+    {
+        var model = new ConverterModel { Value = 5 };
+        var viewModel = new ConverterDiffNameViewModel(model);
+
+        Assert.AreEqual(model.Value.ToString(), viewModel.DiffValue, nameof(viewModel.DiffValue));
+
+        viewModel.DiffValue = "20";
+
+        Assert.AreEqual(20, model.Value, nameof(model.Value));
+    }
     #endregion
 
     #region Helper
