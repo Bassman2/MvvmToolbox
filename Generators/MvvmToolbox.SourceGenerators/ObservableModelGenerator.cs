@@ -64,8 +64,18 @@ public partial class ObservableModelGenerator : Generator
                 }
 
                 public string? ModelPropertyName { get; } = null; 
-                public string? Converter { get; init; }
-                public string? ModelType { get; init; }
+                public string? Converter { get; init; } = null;
+                public Type? ConverterType { get; init; } = null;
+                public Type? ModelType { get; init; } = null;
+            }
+
+            public interface IPropertyConverter
+            {
+                // From Model to ViewModel
+                object Convert(object value);
+
+                // From ViewModel to Model
+                object ConvertBack(object value);
             }
             """);
     }
@@ -108,8 +118,9 @@ public partial class ObservableModelGenerator : Generator
                 string viewModelPropertyType = (prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName).TrimEnd('?');
                 string? modelPropertyType = propAttr.GetNamedArgument("ModelType")?.Value?.ToString() ?? null;
                 string? converterName = propAttr.GetNamedArgument("Converter")?.Value?.ToString() ?? null;
+                string? converterClassName = propAttr.GetNamedArgument("ConverterType")?.Value?.ToString() ?? null;
 
-                sb.AppendLine(CreateConstructorLine(dataType, prop.Name, viewModelPropertyType, modelPropertyName, modelPropertyType, converterName));
+                sb.AppendLine(CreateConstructorLine(dataType, prop.Name, viewModelPropertyType, modelPropertyName, modelPropertyType, converterName, converterClassName));
             }
         }
 
@@ -129,8 +140,9 @@ public partial class ObservableModelGenerator : Generator
                 string viewModelPropertyType = (prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName); //.TrimEnd('?');
                 string? modelPropertyType = propAttr.GetNamedArgument("ModelType")?.Value?.ToString() ?? null;
                 string? converterName = propAttr.GetNamedArgument("Converter")?.Value?.ToString() ?? null;
+                string? converterClassName = propAttr.GetNamedArgument("ConverterType")?.Value?.ToString() ?? null;
 
-                sb.AppendLine(CreateSetterMethods(dataType, prop.Name, viewModelPropertyType, modelPropertyName, modelPropertyType, converterName));
+                sb.AppendLine(CreateSetterMethods(dataType, prop.Name, viewModelPropertyType, modelPropertyName, modelPropertyType, converterName, converterClassName));
             }
         }
 
@@ -148,14 +160,19 @@ public partial class ObservableModelGenerator : Generator
         Model,
         List,
         ModelList,
-        Converter,
+        ConverterFunc,
+        ConverterClass
     }
 
     public DataType GetDataType(Class cl, Property prop, GeneratorLibrary.Attribute propAttr)
     {
         if (propAttr.HasNamedArgument("Converter"))
         {
-            return DataType.Converter;
+            return DataType.ConverterFunc;
+        }
+        else if (propAttr.HasNamedArgument("ConverterType"))
+        {
+            return DataType.ConverterClass;
         }
         else if (prop.Type.IsObservableCollection)
         {
@@ -183,7 +200,7 @@ public partial class ObservableModelGenerator : Generator
         }
     }
     
-    public string CreateConstructorLine(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? modelPropertyType, string? converterName)
+    public string CreateConstructorLine(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? modelPropertyType, string? converterName, string? converterClassName)
     {
         return //$"        // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName} mType: {modelPropertyType} converter: {converterName}\r\n" +
             dataType switch
@@ -203,13 +220,15 @@ public partial class ObservableModelGenerator : Generator
                         {{viewModelPropertyName}} = [.. (model.{{modelPropertyName}} ?? []).Select(m => new {{viewModelPropertyType}}(m))];
                         {{viewModelPropertyName}}.CollectionChanged += On{{viewModelPropertyName}}CollectionChanged;
                 """,
-            DataType.Converter => 
+            DataType.ConverterFunc => 
                 $"        {viewModelPropertyName} = Get{converterName}(model.{modelPropertyName});",
+            DataType.ConverterClass =>
+           $"        {viewModelPropertyName} = ({viewModelPropertyType})(new {converterClassName}()).Convert(model.{modelPropertyName});",
             _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
         };
     }
 
-    public string CreateSetterMethods(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? modelPropertyType, string? converterName)
+    public string CreateSetterMethods(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? modelPropertyType, string? converterName, string? converterClassName)
     {
         return //$"    // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName} mType: {modelPropertyType} converter: {converterName}\r\n" +
             dataType switch
@@ -315,15 +334,19 @@ public partial class ObservableModelGenerator : Generator
                          }   
                      }
                  """,
-            DataType.Converter =>
+            DataType.ConverterFunc =>
                 $$"""
                     partial void On{{viewModelPropertyName}}Changed({{viewModelPropertyType}} value)
                     {
                         Model.{{modelPropertyName}} = Set{{converterName}}(value);
                     }
-
-                    private static partial {{viewModelPropertyType}} Get{{converterName}}({{modelPropertyType}} value);
-                    private static partial {{modelPropertyType}} Set{{converterName}}({{viewModelPropertyType}} value);
+                """,
+            DataType.ConverterClass =>
+            $$"""
+                    partial void On{{viewModelPropertyName}}Changed({{viewModelPropertyType}} value)
+                    {
+                        Model.{{modelPropertyName}} = ({{modelPropertyType}})new {{converterClassName}}().ConvertBack({{viewModelPropertyName}});
+                    }
                 """,
             _ => throw new ArgumentOutOfRangeException(nameof(dataType), dataType, null)
         };
