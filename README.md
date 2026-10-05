@@ -195,11 +195,11 @@ namespace Demo.ViewModels;
 public partial class DemoViewModel : ObservableObject
 {
     [ObservableProperty]
-    [ObservableModelProperty(Converter:"NumConvert")]
+    [ObservableModelProperty(Converter = "NumConvert", ModelType = "int")]
     public partial string Num { get; set; }
 
-    partial string GetNumConvert(int val) => val.ToString();
-    partial int SetNumConvert(string val) => int.Parse(val);
+    private static partial string GetNumConvert(int val) => val.ToString();
+    private static partial int SetNumConvert(string val) => int.Parse(val);
 }
 ```
 
