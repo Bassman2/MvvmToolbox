@@ -185,7 +185,7 @@ public partial class ObservableModelGenerator : Generator
     
     public string CreateConstructorLine(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? modelPropertyType, string? converterName)
     {
-        return $"        // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName} mType: {modelPropertyType} converter: {converterName}\r\n" +
+        return //$"        // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName} mType: {modelPropertyType} converter: {converterName}\r\n" +
             dataType switch
         {
             DataType.Error => string.Empty,
@@ -211,7 +211,7 @@ public partial class ObservableModelGenerator : Generator
 
     public string CreateSetterMethods(DataType dataType, string viewModelPropertyName, string viewModelPropertyType, string modelPropertyName, string? modelPropertyType, string? converterName)
     {
-        return $"    // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName} mType: {modelPropertyType} converter: {converterName}\r\n" +
+        return //$"    // {dataType}: vmName: {viewModelPropertyName} vmType: {viewModelPropertyType} mName: {modelPropertyName} mType: {modelPropertyType} converter: {converterName}\r\n" +
             dataType switch
         {
             DataType.Error => string.Empty,
