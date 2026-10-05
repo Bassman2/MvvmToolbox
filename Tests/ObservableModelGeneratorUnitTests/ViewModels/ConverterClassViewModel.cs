@@ -4,7 +4,7 @@
 public partial class ConverterClassViewModel : ObservableObject
 {
     [ObservableProperty]
-    [ObservableModelProperty(ConverterType = typeof(IntToStringConverter), ModelType = typeof(ConverterModel))]
+    [ObservableModelProperty(ConverterType = typeof(IntToStringConverter))]
     public partial string Value { get; set; }
 
     public class IntToStringConverter : IPropertyConverter

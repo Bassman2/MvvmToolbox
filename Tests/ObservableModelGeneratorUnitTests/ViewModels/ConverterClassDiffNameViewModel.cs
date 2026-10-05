@@ -4,7 +4,7 @@
 public partial class ConverterClassDiffNameViewModel : ObservableObject
 {
     [ObservableProperty]
-    [ObservableModelProperty("Value", ConverterType = typeof(IntToStringConverter), ModelType = typeof(ConverterModel))]
+    [ObservableModelProperty("Value", ConverterType = typeof(IntToStringConverter))]
     public partial string DiffValue { get; set; }
 
     public class IntToStringConverter : IPropertyConverter
