@@ -1,0 +1,125 @@
+﻿
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Text;
+
+
+namespace MvvmToolbox.SourceGenerators;
+
+[Generator(LanguageNames.CSharp)]
+public partial class ObservableModelGenerator : IIncrementalGenerator
+{
+    public void Initialize(IncrementalGeneratorInitializationContext context)
+    {
+        context.RegisterPostInitializationOutput(postInitializationContext => CreateAttributes(postInitializationContext));
+
+        var provider = context.SyntaxProvider.CreateSyntaxProvider(
+                predicate: static (node, _) => IsSyntaxTargetForGeneration(node),           //node is ClassDeclarationSyntax || node is EnumDeclarationSyntax,
+                transform: static (ctx, _) => (BaseTypeDeclarationSyntax)ctx.Node           // (ClassDeclarationSyntax)ctx.Node
+                ).Where(m => m is not null).Collect();
+
+        var compilation = context.CompilationProvider.Combine(provider);
+
+        context.RegisterSourceOutput(compilation, Execute);
+    }
+
+    private static bool IsSyntaxTargetForGeneration(SyntaxNode node)
+     => (node is ClassDeclarationSyntax c && c.AttributeLists.Count > 0) ||
+        (node is EnumDeclarationSyntax e && e.AttributeLists.Count > 0);
+
+
+    private void Execute(SourceProductionContext context, (Compilation Left, ImmutableArray<BaseTypeDeclarationSyntax> Right) tuple)
+    {
+        Context = context;
+        Compilation = tuple.Left;
+        Classes = [.. tuple.Right.Where(i => i is ClassDeclarationSyntax).Cast<ClassDeclarationSyntax>()];         // OfType<string>();
+        Enums = [.. tuple.Right.Where(i => i is EnumDeclarationSyntax).Cast<EnumDeclarationSyntax>()];
+        try
+        {
+            Execute();
+        }
+        catch (Exception ex)
+        {
+            var message = ex.ToString().Replace("/*", "/ *").Replace("*/", "* /");
+            context.AddSource($"Error_{Guid.NewGuid():N}.g.cs", $"/*\r\n{message}\r\n*/");
+        }
+    }
+
+    protected SourceProductionContext Context { get; private set; }
+
+    protected Compilation Compilation { get; private set; } = null!;
+
+    //protected ImmutableArray<ClassDeclarationSyntax> Classes { get; private set; }
+    protected ClassDeclarationSyntax[] Classes { get; private set; } = [];
+
+    protected EnumDeclarationSyntax[] Enums { get; private set; } = [];
+
+    #region Extention
+
+    //public IEnumerable<INamedTypeSymbol> GetAllClassesExt()
+    //{
+    //    foreach (var cla in Classes)
+    //    {
+    //        if (Compilation.GetSemanticModel(cla.SyntaxTree).GetDeclaredSymbol(cla) is INamedTypeSymbol symbol)
+    //        {
+    //            yield return symbol;
+    //        }
+    //    }
+    //}
+
+    // TODO
+    //public IEnumerable<INamedTypeSymbol> GetAllClassesWithAttributeExt(string attributeFullClassName) 
+    //    => GetAllClassesExt().Where(c => ((ISymbol)c).HasAttribute(attributeFullClassName));
+
+    #endregion
+
+    
+
+    //public string AssemblyName => Compilation.AssemblyName ?? "";
+
+    //public string GlobalNamespace => Compilation.AssemblyName ?? "";
+    
+    //=> Compilation.Assembly.ContainingNamespace.ToDisplayString();
+
+    //public IEnumerable<Class> GetAllClassesWithAttribute(string attributeFullName) => GetAllClasses().Where(c => c.HasAttribute(attributeFullName));
+
+    //public IEnumerable<Enum> GetAllEnumsWithAttribute(string attributeFullName) => GetAllEnums().Where(c => c.HasAttribute(attributeFullName));
+
+    public void AddSource(string hintName, string source) => Context.AddSource(hintName, source);
+
+    //public override IEnumerable<Attribute> Attributes => Compilation.Assembly.GetAttributes().Select(a => new Attribute(a));
+
+    public static string? FirstLetterToLower(string? str)
+    {
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (str.Length == 1)
+        {
+            return str.ToLower();
+        }
+
+        return char.ToLower(str[0]) + str.Substring(1);
+    }
+
+    public static string? FirstLetterToUpper(string? str)
+    {
+        if (str == null)
+        {
+            return null;
+        }
+
+        if (str.Length == 1)
+        {
+            return str.ToLower();
+        }
+
+        return char.ToUpper(str[0]) + str.Substring(1);
+    }
+}

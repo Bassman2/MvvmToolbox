@@ -69,6 +69,25 @@ public class Generator : BaseAttributes, IIncrementalGenerator
     public virtual void Execute()
     { }
 
+    #region Extention
+
+    public IEnumerable<INamedTypeSymbol> GetAllClassesExt()
+    {
+        foreach (var cla in Classes)
+        {
+            if (Compilation.GetSemanticModel(cla.SyntaxTree).GetDeclaredSymbol(cla) is INamedTypeSymbol symbol)
+            {
+                yield return symbol;
+            }
+        }
+    }
+
+    // TODO
+    //public IEnumerable<INamedTypeSymbol> GetAllClassesWithAttributeExt(string attributeFullClassName) 
+    //    => GetAllClassesExt().Where(c => ((ISymbol)c).HasAttribute(attributeFullClassName));
+
+    #endregion
+
     public IEnumerable<Class> GetAllClasses()
     {
         foreach (var cla in Classes)
