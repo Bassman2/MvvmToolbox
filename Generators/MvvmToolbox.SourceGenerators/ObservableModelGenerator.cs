@@ -97,7 +97,8 @@ partial class ObservableModelGenerator
         string viewModelPropertyType = IsObservableCollection(prop.Type) ? GetInnerType(prop.Type)!.ToDisplayString() : prop.Type.ToDisplayString(); 
 
         string modelPropertyName = propAttr.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? prop.Name;
-        string modelPropertyType = modelSymbol?.GetMembers(modelPropertyName).OfType<IPropertySymbol>().FirstOrDefault()?.Type.ToDisplayString()!;
+        //string modelPropertyType = modelSymbol?.GetMembers(modelPropertyName).OfType<IPropertySymbol>().FirstOrDefault()?.Type.ToDisplayString()!;
+        string modelPropertyType = GetPropertyTypeRecursive(modelSymbol!, modelPropertyName);
 
         string test = modelSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "null";
         debugString += $"\r\n    //{modelPropertyName} = {modelPropertyType} -------- {test}";

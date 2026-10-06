@@ -14,6 +14,26 @@ partial class ObservableModelGenerator
     public string GlobalNamespace => Compilation.AssemblyName ?? "";
 
 
+    public string GetPropertyTypeRecursive(ITypeSymbol symbol, string propertyName)
+    {
+        var currentSymbol = symbol;
+
+        // Schleife wandert die Vererbungskette nach oben (bis zu Object)
+        while (currentSymbol != null)
+        {
+            var property = currentSymbol.GetMembers(propertyName).OfType<IPropertySymbol>().FirstOrDefault();
+            if (property != null)
+            {
+                return property.Type.ToDisplayString();
+            }
+
+            // Eine Ebene nach oben in der Vererbung gehen
+            currentSymbol = currentSymbol.BaseType;
+        }
+
+        return string.Empty;
+    }
+
     #region Classes
 
     public IEnumerable<INamedTypeSymbol> GetAllClasses()
