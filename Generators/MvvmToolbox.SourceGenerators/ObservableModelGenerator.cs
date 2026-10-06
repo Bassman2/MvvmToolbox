@@ -103,8 +103,15 @@ partial class ObservableModelGenerator
         string test = modelSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "null";
         debugString += $"\r\n    //{modelPropertyName} = {modelPropertyType} -------- {test}";
 
-        string? converterName = GetNamedArgument(propAttr, "Converter")?.Value.ToString() ?? null;
-        string? converterClassName = GetNamedArgument(propAttr, "ConverterType")?.Value.ToString() ?? null;
+        string? converterName = null; // GetNamedArgument(propAttr, "Converter")?.Value.ToString() ?? null;
+        string? converterClassName = null; // = GetNamedArgument(propAttr, "ConverterType")?.Value.ToString() ?? null;
+
+        var converterArgument = GetNamedArgument(propAttr, "ConverterType");
+        if (converterArgument.HasValue && converterArgument.Value.Value.Value is ITypeSymbol typeSymbol)
+        {
+            // 3. Den vollständig qualifizierten Namen ermitteln
+            converterClassName = typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
+        }
 
         return new PropertyData
         {
@@ -191,7 +198,7 @@ partial class ObservableModelGenerator
    
     public string CreateConstructorLine(PropertyData propertyData)
     {
-        return //$"        // {propertyData.DataType}: vmName: {propertyData.ViewModelPropertyName} vmType: {propertyData.ViewModelPropertyType.TrimEnd('?')} mName: {propertyData.ModelPropertyName} mType: {propertyData.ModelPropertyType.TrimEnd('?')} converter: {propertyData.Converter}\r\n" +
+        return $"        // {propertyData.DataType}: vmName: {propertyData.ViewModelPropertyName} vmType: {propertyData.ViewModelPropertyType.TrimEnd('?')} mName: {propertyData.ModelPropertyName} mType: {propertyData.ModelPropertyType.TrimEnd('?')} converter: {propertyData.Converter}\r\n" +
             propertyData.DataType switch
             {
                 DataType.Error => string.Empty,
