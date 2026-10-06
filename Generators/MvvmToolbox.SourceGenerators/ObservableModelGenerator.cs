@@ -99,11 +99,11 @@ partial class ObservableModelGenerator
         string modelPropertyName = propAttr.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? prop.Name;
         //string modelPropertyType = modelSymbol?.GetMembers(modelPropertyName).OfType<IPropertySymbol>().FirstOrDefault()?.Type.ToDisplayString()!;
         string modelPropertyType = GetPropertyTypeRecursive(modelSymbol!, modelPropertyName);
-
+            
         string test = modelSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "null";
         debugString += $"\r\n    //{modelPropertyName} = {modelPropertyType} -------- {test}";
 
-        string? converterName = null; // GetNamedArgument(propAttr, "Converter")?.Value.ToString() ?? null;
+        string? converterName = GetNamedArgument(propAttr, "Converter")?.Value.Value as string ?? null;
         string? converterClassName = null; // = GetNamedArgument(propAttr, "ConverterType")?.Value.ToString() ?? null;
 
         var converterArgument = GetNamedArgument(propAttr, "ConverterType");
