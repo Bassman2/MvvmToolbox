@@ -1,5 +1,4 @@
-﻿using GeneratorLibrary;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -8,18 +7,20 @@ using static MvvmToolbox.SourceGenerators.ObservableModelGenerator;
 
 namespace MvvmToolbox.SourceGenerators;
 
-[Generator(LanguageNames.CSharp)]
-public partial class ObservableModelGenerator : Generator
+partial class ObservableModelGenerator 
 {
-    private const string ObservableModelObjectAttribute = "MvvmToolbox.ComponentModel.ObservableModelObjectAttribute";
-    private const string ObservableModelPropertyAttribute = "MvvmToolbox.ComponentModel.ObservableModelPropertyAttribute";
+    private const string ObservableModelObjectAttributeName = "MvvmToolbox.ComponentModel.ObservableModelObjectAttribute";
+    private const string ObservableModelPropertyAttributeName = "MvvmToolbox.ComponentModel.ObservableModelPropertyAttribute";
 
-    //private const string FindFieldsGeneratorAttribute = "MediaDevices.FindFieldsGeneratorAttribute";
-    //private const string EnumGuidAttribute = "MediaDevices.EnumGuidAttribute";
-    //private const string KeyAttribute = "MediaDevices.KeyAttribute";
+    private INamedTypeSymbol? ObservableModelObjectAttribute;
+    private INamedTypeSymbol? ObservableModelPropertyAttribute;
 
-    public override void Execute()
+    public void Execute()
     {
+
+        ObservableModelObjectAttribute = Compilation.GetTypeByMetadataName(ObservableModelObjectAttributeName);
+        ObservableModelPropertyAttribute = Compilation.GetTypeByMetadataName(ObservableModelPropertyAttributeName);
+
         //Location errorLocation = propertySyntax.GetLocation();
         //string propertyName = propertySyntax.Identifier.Text;
 
@@ -29,73 +30,34 @@ public partial class ObservableModelGenerator : Generator
         //ReportError("Test");
 
         //Debugger.Launch();
+
         CreateDebug();
 
         // get all classes with [ObservableModelObjectAttribute] 
-        foreach (var cl in GetAllClassesWithAttribute(ObservableModelObjectAttribute))
+        foreach (var cl in GetAllClassesWithAttribute(ObservableModelObjectAttribute!))
         {
             CreateClassFile(cl);
         }
-       
     }
-
-    protected override void CreateAttributes(IncrementalGeneratorPostInitializationContext context)
-    {
-        context.AddSource($"ObservableModelAttributes.g.cs",
-            """
-            #nullable enable
-
-            namespace MvvmToolbox.ComponentModel;
-
-            [AttributeUsage(AttributeTargets.Class)]
-            public class ObservableModelObjectAttribute(Type modelType): Attribute
-            { 
-                public Type ModelType { get; } = modelType;
-            }
-
-            [AttributeUsage(AttributeTargets.Property)]
-            public class ObservableModelPropertyAttribute : Attribute
-            { 
-                public ObservableModelPropertyAttribute()
-                { }
-
-                public ObservableModelPropertyAttribute(string modelPropertyName)
-                {
-                    ModelPropertyName = modelPropertyName;
-                }
-
-                public string? ModelPropertyName { get; } = null; 
-                public string? Converter { get; init; } = null;
-                public Type? ConverterType { get; init; } = null;
-            }
-
-            public interface IPropertyConverter
-            {
-                // From Model to ViewModel
-                object Convert(object value);
-
-                // From ViewModel to Model
-                object ConvertBack(object value);
-            }
-            """);
-    }
+    
+    private string debugString = string.Empty;
 
     public enum DataType { Error, Simple, Model, List, ModelList, ConverterFunc, ConverterClass }
 
-    public DataType GetDataType(Property prop, GeneratorLibrary.Attribute propAttr)
+    public DataType GetDataType(IPropertySymbol prop, AttributeData propAttr)
     {
-        if (propAttr.HasNamedArgument("Converter"))
+        if (HasNamedArgument(propAttr,"Converter"))
         {
             return DataType.ConverterFunc;
         }
-        else if (propAttr.HasNamedArgument("ConverterType"))
+        else if (HasNamedArgument(propAttr, "ConverterType"))
         {
             return DataType.ConverterClass;
         }
-        else if (prop.Type.IsObservableCollection)
+        else if (IsObservableCollection(prop.Type))
         {
-            var innerType = prop.Type.GetInnerType()!;
-            if (innerType.ImplementsInterface("System.ComponentModel.INotifyPropertyChanged"))
+            var innerType = GetInnerType(prop.Type)!;
+            if (ImplementsInterface(innerType, "System.ComponentModel.INotifyPropertyChanged"))
             {
                 // type is a ViewModel type, because it implements INotifyPropertyChanged
                 return DataType.ModelList;
@@ -107,7 +69,7 @@ public partial class ObservableModelGenerator : Generator
         }
         else
         {
-            if (prop.Type.ImplementsInterface("System.ComponentModel.INotifyPropertyChanged"))
+            if (ImplementsInterface(prop.Type, "System.ComponentModel.INotifyPropertyChanged"))
             {
                 return DataType.Model;
             }
@@ -128,17 +90,20 @@ public partial class ObservableModelGenerator : Generator
         public string? Converter { get; set; }
     }
 
-    private PropertyData FindData(Property prop, GeneratorLibrary.Attribute propAttr, INamedTypeSymbol? modelSymbol)
+    private PropertyData FindData(IPropertySymbol prop, AttributeData propAttr, INamedTypeSymbol? modelSymbol)
     {
         DataType dataType = GetDataType(prop, propAttr);
         string viewModelPropertyName = prop.Name;
-        string viewModelPropertyType = (prop.Type.IsObservableCollection ? prop.Type.GetInnerType()!.FullName : prop.Type.FullName); 
+        string viewModelPropertyType = IsObservableCollection(prop.Type) ? GetInnerType(prop.Type)!.ToDisplayString() : prop.Type.ToDisplayString(); 
 
-        string modelPropertyName = propAttr.ConstructorArguments.FirstOrDefault()?.Value ?? prop.Name;
+        string modelPropertyName = propAttr.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? prop.Name;
         string modelPropertyType = modelSymbol?.GetMembers(modelPropertyName).OfType<IPropertySymbol>().FirstOrDefault()?.Type.ToDisplayString()!;
 
-        string? converterName = propAttr.GetNamedArgument("Converter")?.Value?.ToString() ?? null;
-        string? converterClassName = propAttr.GetNamedArgument("ConverterType")?.Value?.ToString() ?? null;
+        string test = modelSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "null";
+        debugString += $"\r\n    //{modelPropertyName} = {modelPropertyType} -------- {test}";
+
+        string? converterName = GetNamedArgument(propAttr, "Converter")?.Value.ToString() ?? null;
+        string? converterClassName = GetNamedArgument(propAttr, "ConverterType")?.Value.ToString() ?? null;
 
         return new PropertyData
         {
@@ -151,16 +116,22 @@ public partial class ObservableModelGenerator : Generator
         };
     }
 
-    private void CreateClassFile(Class cl)
+    private void CreateClassFile(INamedTypeSymbol cl)
     {
-        var attr = cl.GetAttribute(ObservableModelObjectAttribute);
-        string modelType = attr != null ? attr.ConstructorArguments.FirstOrDefault().Value : string.Empty;
-
+        var attr = GetAttribute(cl, ObservableModelObjectAttribute!);
+        
+        string modelType = attr != null ? attr.ConstructorArguments.FirstOrDefault().Value?.ToString() ?? "" : string.Empty;
         INamedTypeSymbol? modelSymbol = Compilation.GetTypeByMetadataName(modelType);
+
+        string test = modelSymbol?.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat) ?? "null"; 
+
+        string classNamespace = cl.ContainingNamespace?.ToDisplayString() ?? string.Empty;
 
         StringBuilder sb = new(
             $$"""
             // <auto-generated />
+
+            // *** {{test}}
 
             #nullable enable annotations
             #nullable disable warnings
@@ -168,7 +139,7 @@ public partial class ObservableModelGenerator : Generator
             // Suppress warnings about [Obsolete] member usage in generated code.
             #pragma warning disable CS0612, CS0618
             
-            namespace {{cl.NameSpace}};
+            namespace {{classNamespace}};
 
             partial class {{cl.Name}}
             {
@@ -180,9 +151,9 @@ public partial class ObservableModelGenerator : Generator
 
             """);
 
-        foreach (var prop in cl.Properties)
+        foreach (var prop in GetProperties(cl))
         {
-            var propAttr = prop.GetAttribute(ObservableModelPropertyAttribute);
+            var propAttr = GetAttribute(prop, ObservableModelPropertyAttribute!);
             if (propAttr != null)
             {
                 PropertyData propertyData = FindData(prop, propAttr, modelSymbol);
@@ -196,15 +167,17 @@ public partial class ObservableModelGenerator : Generator
 
             """);
 
-        foreach (var prop in cl.Properties)
+        foreach (var prop in GetProperties(cl))
         {
-            var propAttr = prop.GetAttribute(ObservableModelPropertyAttribute);
+            var propAttr = GetAttribute(prop, ObservableModelPropertyAttribute!);
             if (propAttr != null)
             {
                 PropertyData propertyData = FindData(prop, propAttr, modelSymbol);
                 sb.AppendLine(CreateSetterMethods(propertyData));
             }
         }
+
+        sb.AppendLine($"    // ## {debugString}");
 
         sb.AppendLine(
             """
@@ -245,7 +218,7 @@ public partial class ObservableModelGenerator : Generator
 
     public string CreateSetterMethods(PropertyData propertyData)
     {
-        return //$"    // {propertyData.DataType}: vmName: {propertyData.ViewModelPropertyName} vmType: {propertyData.ViewModelPropertyType} mName: {propertyData.ModelPropertyName} mType: {propertyData.ModelPropertyType} converter: {propertyData.Converter}\r\n" +
+        return $"    // {propertyData.DataType}: vmName: {propertyData.ViewModelPropertyName} vmType: {propertyData.ViewModelPropertyType} mName: {propertyData.ModelPropertyName} mType: {propertyData.ModelPropertyType} converter: {propertyData.Converter}\r\n" +
             propertyData.DataType switch
             {
                 DataType.Error => string.Empty,
