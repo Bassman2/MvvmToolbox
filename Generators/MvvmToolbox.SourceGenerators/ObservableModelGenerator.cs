@@ -170,8 +170,11 @@ partial class ObservableModelGenerator
         }
 
         sb.AppendLine(
-            """
+            $$"""
+                    Initialize(model);
                 }
+
+                partial void Initialize({{modelType}} model);
 
             """);
 
